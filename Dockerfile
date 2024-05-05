@@ -1,13 +1,12 @@
 # Use the official PHP image as base
-FROM php:8.0-fpm
+FROM php:8.3.7RC1-fpm-alpine3.19
 
 # Set working directory
 WORKDIR /var/www/html
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql
+RUN apk --no-cache add postgresql-dev && \
+    docker-php-ext-install pdo pdo_pgsql
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -16,6 +15,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY . .
 
 # Install dependencies
+ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN composer install
 
 # Expose port
